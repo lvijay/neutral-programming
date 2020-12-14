@@ -22,7 +22,7 @@ def corpus(filename):
     with open(filename) as fn:
         return fn.read()
 
-def generate(filename):
+def generate(filename, odir):
     data = corpus(filename)
     width = len(str(len(data) * len(CATEGORIES)))
     for k, v in CATEGORIES.items():
@@ -31,11 +31,11 @@ def generate(filename):
         for i in range(len(data)):
             prefix, suffix = data[:i], data[i:]
             filename = fileprefix + f'{i:#0{width}d}.py'
-            with open(filename, 'w') as out:
+            with open(odir + '/' + filename, 'w') as out:
                 out.write(prefix + candidate + suffix)
 
 if __name__ == '__main__':
     import sys
-    generate(sys.argv[1])
+    generate(sys.argv[1], sys.argv[2])
 
 ## generate.py ends here
