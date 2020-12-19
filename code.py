@@ -1,11 +1,13 @@
 def din(n):
-  if n: reset()
-  else: less()
+ if n:
+  rest()
+ else:
+  less()
 
-## rest
-def reset():
-  print("tridnt")
+## reset
+def rest():
+ print("tridnt")
 
+"""lesser"""
 def less():
-  """lesser"""
-  print("lensed")
+ print("lensed")
