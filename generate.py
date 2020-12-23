@@ -11,6 +11,7 @@ def get_category(char):
     if char.isdigit(): return '𝓃'
     if char in ' ': return '␠'
     if char in '\n': return '␤'
+    if char in '{([])}': return '⌶'
     return char              # other characters are their own category
 
 def get_catprefix(category):
@@ -19,28 +20,39 @@ def get_catprefix(category):
         '𝓃': 'digit',
         '␠': 'space',
         '␤': 'newline',
-        '(': 'paren-open',
-        ')': 'paren-close',
         '_': 'underscore',
         '"': 'dquote',
         "'": 'squote',
         '#': 'hash',
-        ':': 'colon'
+        ':': 'colon',
+        ';': 'semicolon',
+        '?': 'qmark',
+        '/': 'slash',
+        '\\': 'backslash',
+        '⌶': 'enclosed'
+        #'(': 'paren-open',
+        #')': 'paren-close',
+        #'{': 'brace-open',
+        #'}': 'brace-closed',
     }[category]
+
+def get_category_representative(categories, k):
+    if k == '/': return '//'    # should be mode specific...
+    return next(iter(categories[k]))
 
 def generate(filename, odir, vals, exec_content_fn):
     data = corpus(filename)
     categories = dict(map(lambda c: (get_category(c), c), data))
     ext = filename[filename.index('.')+1:] # extension
-    for k, v in categories.items():
+    for k in categories.keys():
         fileprefix = get_catprefix(k)
-        candidate = next(iter(v))
-        for i in range(1, 1+len(data)):
+        candidate = get_category_representative(categories, k)
+        for i in range(len(data)):
             prefix, suffix = data[:i], data[i:]
             filename = lambda c, v: f'{fileprefix}_{c}_{v}.{ext}'
             content = prefix + candidate + suffix
             for val in vals:
-                fname = filename(i, val)
+                fname = filename(i+1, val)
                 exec_content = exec_content_fn(val)
                 with open(os.path.join(odir, fname), 'w') as out:
                     print(prefix + candidate + suffix, file=out)
@@ -51,9 +63,19 @@ if __name__ == '__main__':
     i = 1
     inputfile, i = sys.argv[i], i+1
     outputdir, i = (sys.argv[i], i+1) if len(sys.argv) >= 2 else ('.', i)
-    ispy = inputfile.endswith('.py')
-    vals = '01' if ispy else ('nil', '1')
-    efn = (lambda x: f'\ndin({x})') if ispy else (lambda x: f'\ndeed {x}')
+    vals, efn = None, None
+    extension = inputfile[inputfile.find('.'):]
+    if extension == '.py':
+        vals = '01'
+        efn = lambda x: f'\ndin({x})'
+    elif extension == '.rb':
+        vals = ('nil', '1')
+        efn = lambda x: f'\ndeed {x}'
+    elif extension == '.c':
+        vals = '01'
+        efn = lambda x: '\nmain(){pees(' + f'{x}' + ');}'
+    else:
+        raise ValueError('Unknown filetype: ' + extension)
     generate(inputfile, outputdir, vals, efn)
 
 ## generate.py ends here
