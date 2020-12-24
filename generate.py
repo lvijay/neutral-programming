@@ -29,11 +29,7 @@ def get_catprefix(category):
         '?': 'qmark',
         '/': 'slash',
         '\\': 'backslash',
-        '⌶': 'enclosed'
-        #'(': 'paren-open',
-        #')': 'paren-close',
-        #'{': 'brace-open',
-        #'}': 'brace-closed',
+        '⌶': 'enclosed'         # all paren family chars
     }[category]
 
 def get_category_representative(categories, k):
