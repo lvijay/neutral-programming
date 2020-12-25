@@ -96,7 +96,7 @@ if __name__ == '__main__':
     for c in set(code):
         cat = get_category(c)
         prefix = get_catprefix(cat)
-        if c == ' ': c = '█'
+        if c == ' ': c = '▢'
         if c == '\n': c = '↲'
         table[prefix].add(c)
     data0, data1 = read_results(results_strm)
