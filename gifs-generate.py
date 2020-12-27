@@ -47,7 +47,7 @@ def nearest_mult(x, n):
     '''same as math.ceil but for ints'''
     return x + (n - x % n)
 
-class Animate(object):
+class Animater(object):
     def __init__(self, text, font):
         self._text = text
         self._font = font
@@ -55,7 +55,7 @@ class Animate(object):
         w, h = self._size(self._text)
         self._xgap = 30
         self._text_width = nearest_mult(w, 100)
-        self._width = self._xgap + 2 * self._text_width
+        self._width = 2 * (self._xgap + self._text_width)
         self._height = nearest_mult(h, 100)
         self._line_spacing = 1
     def _size(self, text):
@@ -70,6 +70,7 @@ class Animate(object):
         clrs1 = ['green' if results[1][i] else 'red' for i in range(len(results[1]))]
         imgs = [self.save(i, char, (clr0, clr1), (footerfns[0](i), footerfns[1](i)))
                 for i, (char, clr0, clr1) in enumerate(zip(chars, clrs0, clrs1))]
+        for img in imgs: self.draw_line_numbers(img, (1, 10))
         return imgs[0].save(outfile,
                             save_all=True,
                             append_images=imgs[1:],
@@ -78,28 +79,36 @@ class Animate(object):
                             loop=0)
     def save(self, index, char, colors, footers):
         img = Image.new('RGB', (self._width, self._height), color='white')
-        offsetfn = lambda i: 5 + self._xgap + self._text_width * i
+        xoffsetfn = lambda i: 32 + (15 + self._text_width) * i
         yoff = 10
         for i, (clr, footer) in enumerate(zip(colors, footers)):
-            self.draw(img, index, char, clr, footer, (offsetfn(i), yoff))
+            self.draw(img, index, char, clr, footer, (xoffsetfn(i), yoff))
         return img
     def draw(self, img, index, char, color, footer, offset):
         sx, sy = offset
         d = ImageDraw.Draw(img)
         d.multiline_text(
-            xy=(sx, sy),
-            text=self._text[:index] + ' ' + self._text[index:],
-            font=font,
-            fill='black',
-            spacing=self._line_spacing)
+                xy=(sx, sy),
+                text=self._text[:index] + ' ' + self._text[index:],
+                font=self._font, fill='black', spacing=self._line_spacing)
         wid, hei = self._chardims
         row, col = index_coords(self._text, index)
         ox, oy = sx + col*wid, sy + row*(hei+self._line_spacing)
-        d.text(xy=(ox, oy), text=char, fill=color, font=font)
+        d.text(xy=(ox, oy), text=char, fill=color, font=self._font)
         ## write footer
         fx, fy = sx, self._height - sy - self._chardims[-1]
-        d.text(xy=(fx, fy), text=footer, fill=color, font=font)
+        d.text(xy=(fx, fy), text=footer, fill=color, font=self._font)
         return img
+    def draw_line_numbers(self, img, offset):
+        d = ImageDraw.Draw(img)
+        lines = len(self._text.splitlines())
+        content = '\n'.join([('% 3d' % i)[1:] for i in range(1,1+lines)])
+        d.multiline_text(offset, text=content, font=self._font, fill='blue',
+                spacing=self._line_spacing)
+        return img
+    def calc_coords(self, dim):
+        # return coordinates for dim part of image
+        # dim = content0, content1, linenum, footer, header
 
 if __name__ == '__main__':
     import sys
@@ -116,7 +125,7 @@ if __name__ == '__main__':
         if c == '\n': c = '↲'
         table[prefix].add(c)
     data = read_results(results_strm)
-    animater = Animate(code, font)
+    animater = Animater(code, font)
     for category in categories:
         chars = infinite(table[category])
         outfile = f'animate_{category}.gif'
