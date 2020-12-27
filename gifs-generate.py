@@ -13,7 +13,7 @@ iterable is empty otherwise continues streaming it forever.
     [1, 2, 3, 1, 2, 3, 1, 2, 3, 1]
     '''
     @staticmethod
-    class iinfinite(object):
+    class _iinfinite(object):
         def __init__(self, iterable):
             self._iterable = iterable
             self._iterator = iter(iterable)
@@ -24,7 +24,7 @@ iterable is empty otherwise continues streaming it forever.
                 self._iterator = iter(self._iterable)
                 return next(self._iterator)
     def __init__(self, iterable): self._iterable = iterable
-    def __iter__(self): return infinite.iinfinite(self._iterable)
+    def __iter__(self): return infinite._iinfinite(self._iterable)
 
 def read_results(resultsin):
     data0 = defaultdict(lambda: dict())
