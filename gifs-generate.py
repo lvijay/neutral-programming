@@ -103,14 +103,11 @@ class Animate(object):
 
 if __name__ == '__main__':
     import sys
-    results_strm = open(sys.argv[1]) if len(sys.argv) > 2 else sys.stdin
+    results_strm = open(sys.argv[1])
     categories = sys.argv[2:]
-
     fontfile = 'DejaVuSansMono.ttf'
     font = ImageFont.truetype(fontfile, 18)
-
     code = corpus('code.py')
-
     table = defaultdict(lambda: set())
     for c in set(code):
         cat = get_category(c)
