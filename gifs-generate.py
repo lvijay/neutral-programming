@@ -155,6 +155,6 @@ if __name__ == '__main__':
         print(outfile)
 
 ### Run Instructions ###
-# time -p ./gifs-generate.py py_results.data `ls python | cut -f1 -d '_' | sort | uniq` | xargs -t -n1 -I{} gifsicle -l0 -d50 -O3 {} -o o{}
+# ./gifs-generate.py py_results.data `ls python | cut -f1 -d_ | sort -u`
 
 ## gifs-generate.py ends here
