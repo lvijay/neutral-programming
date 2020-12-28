@@ -72,13 +72,14 @@ class Animater(object):
                         (footerfns[0](i), footerfns[1](i)))
                 for i, (char, clr0, clr1) in enumerate(zip(chars, clrs0, clrs1))]
         ## hold the last image for a bit
-        last = imgs[-1]
-        imgs += ([last] * 10)
+        durations = [500 for img in imgs]
+        durations[-1] = durations[-1] * 5
         return imgs[0].save(outfile,
                             save_all=True,
                             append_images=imgs[1:],
-                            optimize=False,
-                            duration=200,
+                            optimize=True,
+                            duration=durations,
+                            include_color_table=False,
                             loop=0)
     def _save(self, index, char, colors, header, footers):
         img = Image.new('RGB', (self._width, self._height), color='white')
@@ -135,7 +136,6 @@ if __name__ == '__main__':
         if c == ' ': c = '▢'
         if c == '\n': c = '↲'
         table[prefix].add(c)
-    print(table, file=sys.stderr)
     data = read_results(results_strm)
     animater = Animater(code, font)
     category_name = {
