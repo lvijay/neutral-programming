@@ -64,51 +64,62 @@ class Animater(object):
         bbox = d.multiline_textbbox((0,0), text, font=self._font, align="left")
         w, h = bbox[2:]
         return w, h
-    def generate(self, outfile, chars, results, footerfns):
+    def generate(self, outfile, chars, results, header, footerfns):
         # hack
         clrs0 = ['green' if results[0][i] else 'red' for i in range(len(results[0]))]
         clrs1 = ['green' if results[1][i] else 'red' for i in range(len(results[1]))]
-        imgs = [self.save(i, char, (clr0, clr1), (footerfns[0](i), footerfns[1](i)))
+        imgs = [self._save(i, char, (clr0, clr1), header,
+                        (footerfns[0](i), footerfns[1](i)))
                 for i, (char, clr0, clr1) in enumerate(zip(chars, clrs0, clrs1))]
-        for img in imgs: self.draw_line_numbers(img, (1, 10))
+        ## hold the last image for a bit
+        last = imgs[-1]
+        imgs += ([last] * 10)
         return imgs[0].save(outfile,
                             save_all=True,
                             append_images=imgs[1:],
                             optimize=False,
                             duration=200,
                             loop=0)
-    def save(self, index, char, colors, footers):
+    def _save(self, index, char, colors, header, footers):
         img = Image.new('RGB', (self._width, self._height), color='white')
-        xoffsetfn = lambda i: 32 + (15 + self._text_width) * i
-        yoff = 10
+        xoffsetfn = lambda i: self._xgap + (21 + self._text_width) * i
+        yoff = 7
+        self._draw_header(img, header, (0, yoff))
+        cwid, chei = self._chardims
+        yoff += (chei + self._line_spacing * 2) + 3
         for i, (clr, footer) in enumerate(zip(colors, footers)):
-            self.draw(img, index, char, clr, footer, (xoffsetfn(i), yoff))
+            xoff = xoffsetfn(i)
+            self._draw(img, index, char, clr, header, footer, (xoff, yoff))
+            self._draw_line_numbers(img, (xoff - cwid * 2 - 5, yoff))
         return img
-    def draw(self, img, index, char, color, footer, offset):
-        sx, sy = offset
+    def _draw_header(self, img, header, xy):
+        d = ImageDraw.Draw(img)
+        wid, hei = self._chardims
+        charsperline = self._width // wid
+        hdr = header.center(charsperline)
+        d.text(xy=xy, text=hdr, fill='blue', font=self._font)
+    def _draw(self, img, index, char, color, header, footer, offset):
         d = ImageDraw.Draw(img)
         d.multiline_text(
-                xy=(sx, sy),
+                xy=offset,
                 text=self._text[:index] + ' ' + self._text[index:],
                 font=self._font, fill='black', spacing=self._line_spacing)
-        wid, hei = self._chardims
         row, col = index_coords(self._text, index)
+        wid, hei = self._chardims
+        sx, sy = offset
         ox, oy = sx + col*wid, sy + row*(hei+self._line_spacing)
         d.text(xy=(ox, oy), text=char, fill=color, font=self._font)
         ## write footer
-        fx, fy = sx, self._height - sy - self._chardims[-1]
+        fx, fy = sx, self._height - self._chardims[-1] - 10
         d.text(xy=(fx, fy), text=footer, fill=color, font=self._font)
         return img
-    def draw_line_numbers(self, img, offset):
+    def _draw_line_numbers(self, img, offset):
         d = ImageDraw.Draw(img)
         lines = len(self._text.splitlines())
         content = '\n'.join([('% 3d' % i)[1:] for i in range(1,1+lines)])
         d.multiline_text(offset, text=content, font=self._font, fill='blue',
                 spacing=self._line_spacing)
         return img
-    def calc_coords(self, dim):
-        # return coordinates for dim part of image
-        # dim = content0, content1, linenum, footer, header
 
 if __name__ == '__main__':
     import sys
@@ -124,14 +135,23 @@ if __name__ == '__main__':
         if c == ' ': c = '▢'
         if c == '\n': c = '↲'
         table[prefix].add(c)
+    print(table, file=sys.stderr)
     data = read_results(results_strm)
     animater = Animater(code, font)
+    category_name = {
+        'alphabet': 'Category: Alphabet',
+        'colon': 'Category: Colon',
+        'dquote': 'Category: Double Quote',
+        'enclosed': 'Category: Parentheses',
+        'hash': 'Category: Hash',
+        'newline': 'Category: Newline',
+        'space': 'Category: Space' }
     for category in categories:
         chars = infinite(table[category])
         outfile = f'animate_{category}.gif'
         results = data[0][category], data[1][category]
         footerfns = (lambda i: f'n=0    pos: {i}'), (lambda i: f'n=1    pos: {i}')
-        animater.generate(outfile, chars, results, footerfns)
+        animater.generate(outfile, chars, results, category_name[category], footerfns)
         print(outfile)
 
 ### Run Instructions ###
