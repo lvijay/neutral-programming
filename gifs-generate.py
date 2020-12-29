@@ -2,29 +2,8 @@
 
 from generate import corpus, get_category, get_catprefix
 from collections import defaultdict
+from itertools import cycle
 from PIL import Image, ImageDraw, ImageFont
-
-class infinite(object):
-    '''Infinite stream over the given iterable.  Throws exception if
-iterable is empty otherwise continues streaming it forever.
-
-    >>> inf = infinite([1,2,3])
-    >>> [i for i, j in zip(inf, range(10))]
-    [1, 2, 3, 1, 2, 3, 1, 2, 3, 1]
-    '''
-    @staticmethod
-    class _iinfinite(object):
-        def __init__(self, iterable):
-            self._iterable = iterable
-            self._iterator = iter(iterable)
-        def __next__(self):
-            try:
-                return next(self._iterator)
-            except StopIteration:
-                self._iterator = iter(self._iterable)
-                return next(self._iterator)
-    def __init__(self, iterable): self._iterable = iterable
-    def __iter__(self): return infinite._iinfinite(self._iterable)
 
 def read_results(resultsin):
     data0 = defaultdict(lambda: dict())
@@ -147,7 +126,7 @@ if __name__ == '__main__':
         'newline': 'Category: Newline',
         'space': 'Category: Space' }
     for category in categories:
-        chars = infinite(table[category])
+        chars = cycle(table[category])
         outfile = f'animate_{category}.gif'
         results = data[0][category], data[1][category]
         footerfns = (lambda i: f'n=0    pos: {i}'), (lambda i: f'n=1    pos: {i}')
