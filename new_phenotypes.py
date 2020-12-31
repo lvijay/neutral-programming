@@ -39,20 +39,20 @@ def draw(img, msg, *lambdas):
         lambd_(d)
 
 if __name__ == '__main__':
-    imgs = [(base_image(), 500)]
+    imgs = [base_image()]
 
-    imgs.append((imgs[-1][0].copy(), 1000))
-    draw(imgs[-1][0], 'an initial state')
+    imgs.append(imgs[-1].copy())
+    draw(imgs[-1], 'an initial state')
 
-    imgs.append((imgs[-1][0].copy(), 1000))
-    draw(imgs[-1][0], 'comment section',
+    imgs.append(imgs[-1].copy())
+    draw(imgs[-1], 'comment section',
          lambda d: d.line((59, 158, 232, 67), fill='green', width=2))
 
-    imgs.append((imgs[0][0].copy(), 2000))
-    draw(imgs[-1][0], 'suppose the following mutations occur')
+    imgs.append(imgs[0].copy())
+    draw(imgs[-1], 'suppose the following mutations occur')
 
-    imgs.append((base_image('#  print("instill") #"de f)t:)'), 2000))
-    draw(imgs[-1][0], 'suppose the following mutations occur')
+    imgs.append(base_image('#  print("instill") #"de f)t:)'))
+    draw(imgs[-1], 'suppose the following mutations occur')
 
     target = '#  print("instill") #"de f)t:)'
     start  = '# _p___t______________________'
@@ -75,20 +75,20 @@ if __name__ == '__main__':
         include_color_table=False,
         loop=2)
 
-    imgs.append((base_image('#'), 2000))
-    draw(imgs[-1][0], 'A mutation adds a newline',
+    imgs.append(base_image('#'))
+    draw(imgs[-1], 'A mutation adds a newline',
          lambda d: d.text((sx,sy+3*lh),'  print("instill")', fill=tc, font=mainfont),
          lambda d: d.text((sx+19*cw,sy+3*lh),'#"de f)t:)', fill=cc, font=mainfont))
 
-    imgs.append((base_image('#  print("instill") #"de f)t:)'), 2000))
-    draw(imgs[-1][0], 'A mutation adds a newline')
+    imgs.append(base_image('#  print("instill") #"de f)t:)'))
+    draw(imgs[-1], 'A mutation adds a newline')
 
-    imgs.append((base_image('#↲ print("instill") #"de f)t:)'), 2000))
-    draw(imgs[-1][0], 'A mutation adds a newline')
+    imgs.append(base_image('#↲ print("instill") #"de f)t:)'))
+    draw(imgs[-1], 'A mutation adds a newline')
 
-    for i, (img, delay) in enumerate(imgs):
+    for i, img in enumerate(imgs):
         filename = f'behavior_{i:03d}.gif'
         img.save(filename)
         print(filename)
-    
+
 ## new_phenotypes.py ends here
