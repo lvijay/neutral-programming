@@ -80,6 +80,12 @@ if __name__ == '__main__':
          lambda d: d.text((sx,sy+3*lh),'  print("instill")', fill=tc, font=mainfont),
          lambda d: d.text((sx+19*cw,sy+3*lh),'#"de f)t:)', fill=cc, font=mainfont))
 
+    imgs.append((base_image('#  print("instill") #"de f)t:)'), 2000))
+    draw(imgs[-1][0], 'A mutation adds a newline')
+
+    imgs.append((base_image('#↲ print("instill") #"de f)t:)'), 2000))
+    draw(imgs[-1][0], 'A mutation adds a newline')
+
     for i, (img, delay) in enumerate(imgs):
         filename = f'behavior_{i:03d}.gif'
         img.save(filename)
