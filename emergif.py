@@ -62,4 +62,12 @@ if __name__ == '__main__':
         include_color_table=False,
         loop=2)
 
+## Generate emerging GIF images
+## Usage:
+## echo -e 'the quick\nbrown fox\njumps' | ./emergif.py 10000 2000
+##
+## emergif reads the text from stdin
+## - argument 1 is total time (in ms) for the gif to run
+## - argument 2 is the time for the final image that shows the text
+
 ## emergif.py ends here
