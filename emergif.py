@@ -36,10 +36,9 @@ def generate(text, size, mainfont, offset):
         ImageDraw.Draw(img).text(offset, val, fill='black', font=mainfont)
     return imgs
 
-def intervals(images, total_time_ms, last_frame_ms):
-    frame_ms = (total_time_ms - last_frame_ms - 1) // len(images)
-    remainder = total_time_ms - last_frame_ms - frame_ms * (len(target) - 1)
-    durations = [frame_ms] * (len(images) - 1) + [last_frame_ms + remainder]
+def intervals(count, total_time_ms, last_frame_ms):
+    frame_ms = max(20, (total_time_ms - last_frame_ms - 1) // count)
+    durations = [frame_ms] * (count - 1) + [last_frame_ms]
     return durations
 
 if __name__ == '__main__':
@@ -53,7 +52,7 @@ if __name__ == '__main__':
     offset = (5, 5)
     size = tuple([nearest_mult(x, 15) for x in get_size(target, offset, mainfont)])
     images = generate(target, size, mainfont, offset)
-    durations = intervals(images, total_time_ms, last_frame_ms)
+    durations = intervals(len(images), total_time_ms, last_frame_ms)
     images[0].save(
         'result.gif',
         save_all=True,
